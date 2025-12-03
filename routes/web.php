@@ -22,6 +22,29 @@ use App\Http\Controllers\Admin\ProductVariantController;
 
 /*
 |--------------------------------------------------------------------------
+| ROUTES CHO ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    
+    // Trang quản lý chung
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('admin.inventory');
+    // CRUD
+    Route::resource('products', AdminProductController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('brands', AdminBrandController::class);
+
+    // Product Variants
+    Route::post('products/{product}/variants', [ProductVariantController::class, 'store'])->name('product_variants.store');
+    Route::delete('variants/{variant}', [ProductVariantController::class, 'destroy'])->name('product_variants.destroy');
+    Route::get('variants', [ProductVariantController::class, 'index'])->name('product_variants.index');
+});
+
+/*
+|--------------------------------------------------------------------------
 | ROUTES CHO USER (KHÁCH HÀNG)
 |--------------------------------------------------------------------------
 */
@@ -85,26 +108,3 @@ Route::get('/return-policy', function () {
     return view('user.return_policy');
 })->name('return.policy');
 
-/*
-|--------------------------------------------------------------------------
-| ROUTES CHO ADMIN
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
-    // Trang quản lý chung
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('admin.inventory');
-
-    // CRUD
-    Route::resource('products', AdminProductController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('brands', AdminBrandController::class);
-
-    // Product Variants
-    Route::post('products/{product}/variants', [ProductVariantController::class, 'store'])->name('product_variants.store');
-    Route::delete('variants/{variant}', [ProductVariantController::class, 'destroy'])->name('product_variants.destroy');
-    Route::get('variants', [ProductVariantController::class, 'index'])->name('product_variants.index');
-});
