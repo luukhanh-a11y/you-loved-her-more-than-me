@@ -4,7 +4,7 @@
 <div class="container py-5">
     <h2 class="text-uppercase fw-bold mb-4 text-center">Giỏ hàng của {{ Auth::user()->name }}</h2>
 
-    @if($cart && $cart->items->count() > 0)
+    @if(isset($cart) && $cart->items->count() > 0)
         <div class="row">
             <div class="col-lg-8">
                 {{-- Thông báo lỗi/thành công từ AJAX sẽ hiện ở đây --}}
@@ -104,7 +104,6 @@
                         </div>
                         
                         {{-- Nút thanh toán - Gửi các ID đã check đi --}}
-                         {{--  {{ route('payment.checkout') }} --}}
                         <form action="{{ route('payment.checkout') }}" method="GET" id="checkout-form">
                             {{-- Input hidden này sẽ được điền bằng JS khi submit --}}
                             <input type="hidden" name="selected_items" id="selected_items_input">
@@ -200,18 +199,13 @@ $(document).ready(function() {
                 // Cập nhật lại thành tiền của item đó trên giao diện
                 row.find('.item-subtotal').text(response.item_total);
                 
-                // Cập nhật lại giá đơn vị (nếu thay đổi variant có giá khác)
-                // row.find('.item-price-display').text(response.new_price);
-                // row.data('price', ...); // Cần logic phức tạp hơn nếu giá variant khác nhau
-                
                 calculateTotal(); // Tính lại tổng tiền giỏ hàng
-                
-                // Hiện thông báo nhỏ
                 console.log(response.success);
             },
             error: function(xhr) {
-                alert(xhr.responseJSON.error || 'Có lỗi xảy ra');
-                // Reset lại giá trị cũ nếu muốn (option)
+                alert(xhr.responseJSON.error || 'Có lỗi xảy ra. Vui lòng kiểm tra lại số lượng hoặc kho hàng.');
+                // Có thể reload lại trang nếu lỗi quá nghiêm trọng
+                // location.reload(); 
             }
         });
     });

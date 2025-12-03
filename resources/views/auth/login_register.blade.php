@@ -1,5 +1,10 @@
 @extends('layouts.app') @section('body')
 <div class="container py-5">
+    @if(Auth::check())
+        <div class="alert alert-info">
+            Xin chào <strong>{{ Auth::user()->name }}</strong>! 
+        </div>
+    @endif
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="row bg-white p-4 shadow-sm rounded position-relative">
@@ -37,7 +42,7 @@
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-danger w-100 rounded-0">
+                            <a href="{{ route('google.login') }}" class="btn btn-outline-danger w-100 rounded-0">
                                 <i class="bi bi-google"></i> Google
                             </a>
                         </div>
@@ -60,6 +65,7 @@
                     <form action="{{ route('register') }}" method="POST">
                         @csrf
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Tên đăng nhập <span classphp="text-danger">*</span></label>
                             <label class="form-label fw-bold">Tên đăng nhập <span class="text-danger">*</span></label>
                             <input type="text" name="register_username" class="form-control rounded-0" required>
                         </div>

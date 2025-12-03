@@ -1,45 +1,87 @@
-<div class="card h-100 border-0 shadow-sm product-card">
-    
+<div class="product-card">
+    <!-- Image Container -->
     <div class="img-box">
-        <a href="#">
+        <a href="{{ route('shop.detail', $product->slug) }}">
             <img src="{{ $product->img_thumbnail }}" 
-                 class="card-img-top product-img" 
+                 class="product-img" 
                  alt="{{ $product->name }}"
-                 onerror="this.src='https://placehold.co/300x300?text=No+Image'">
+                 loading="lazy"
+                 onerror="this.src='https://placehold.co/400x400/f8f9fa/999?text=No+Image'">
         </a>
         
+        <!-- Discount Badge -->
         @if($product->price_sale)
-            <span class="badge bg-danger position-absolute top-0 start-0 m-3 rounded-0">
-                -{{ round((($product->price - $product->price_sale) / $product->price) * 100) }}%
+            @php
+                $discount = round((($product->price - $product->price_sale) / $product->price) * 100);
+            @endphp
+            <span class="badge bg-danger position-absolute top-0 start-0 m-2 rounded-pill">
+                -{{ $discount }}%
             </span>
         @endif
-
+        
+        <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn btn-dark btn-sm rounded-circle me-1" title="Thêm vào giỏ">
-                <i class="bi bi-cart-plus"></i>
-            </button>
-            <a href="{{ route('shop.detail', $product->slug) }}" class="btn btn-outline-dark btn-sm rounded-circle" title="Xem chi tiết">
+            <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="quantity" value="1">
+                @if($product->variants->isNotEmpty())
+                    <input type="hidden" name="variant_id" value="{{ $product->variants->first()->id }}">
+                @endif
+                <button type="submit" class="btn" title="Thêm vào giỏ">
+                    <i class="bi bi-cart-plus"></i>
+                </button>
+            </form>
+            
+            <a href="{{ route('shop.detail', $product->slug) }}" 
+               class="btn" 
+               title="Xem chi tiết">
                 <i class="bi bi-eye"></i>
             </a>
         </div>
     </div>
     
-    <div class="card-body text-center p-2">
-        <div class="text-muted small text-uppercase mb-1">{{ $product->brand->name ?? 'Hãng' }}</div>
+    <!-- Card Body -->
+    <div class="card-body">
+        <!-- Brand -->
+        <div class="text-muted text-uppercase small mb-1">
+            {{ $product->brand->name ?? 'Thương hiệu' }}
+        </div>
         
-        <h6 class="card-title text-truncate mb-2">
-            <a href="#" class="text-decoration-none text-dark fw-bold" title="{{ $product->name }}">
-                {{ $product->name }}
+        <!-- Product Name -->
+        <h6 class="card-title">
+            <a href="{{ route('shop.detail', $product->slug) }}" 
+               class="text-dark" 
+               title="{{ $product->name }}">
+                {{ Str::limit($product->name, 50) }}
             </a>
         </h6>
         
+        <!-- Price -->
         <div class="price-box">
             @if($product->price_sale)
-                <span class="text-danger fw-bold">{{ number_format($product->price_sale) }}đ</span>
-                <span class="text-muted text-decoration-line-through small ms-1">{{ number_format($product->price) }}đ</span>
+                <span class="text-danger fw-bold me-2">
+                    {{ number_format($product->price_sale) }}đ
+                </span>
+                <span class="text-muted text-decoration-line-through small">
+                    {{ number_format($product->price) }}đ
+                </span>
             @else
-                <span class="fw-bold text-dark">{{ number_format($product->price) }}đ</span>
+                <span class="fw-bold text-dark">
+                    {{ number_format($product->price) }}đ
+                </span>
             @endif
         </div>
+        
+        <!-- Stock Status -->
+        @if($product->variants->sum('quantity') > 0)
+            <small class="text-success">
+                <i class="bi bi-check-circle"></i> Còn hàng
+            </small>
+        @else
+            <small class="text-danger">
+                <i class="bi bi-x-circle"></i> Hết hàng
+            </small>
+        @endif
     </div>
 </div>

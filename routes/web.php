@@ -50,7 +50,7 @@ Route::get('/thuong-hieu', [UserBrandController::class, 'index'])->name('brands.
 Route::get('/thuong-hieu/{slug}', [UserBrandController::class, 'show'])->name('brands.show');
 
 // ============================================================
-// [BỔ SUNG] ROUTES GIỎ HÀNG (CART) - QUAN TRỌNG
+// [QUAN TRỌNG] ROUTES GIỎ HÀNG (CART)
 // ============================================================
 Route::middleware(['auth'])->group(function () {
     Route::get('/gio-hang', [CartController::class, 'index'])->name('cart.index');

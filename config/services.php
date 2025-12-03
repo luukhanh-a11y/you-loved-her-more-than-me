@@ -15,11 +15,14 @@ return [
     */
 
     'postmark' => [
+
+        'token' => env('POSTMARK_TOKEN'),
         'key' => env('POSTMARK_API_KEY'),
     ],
 
     'resend' => [
         'key' => env('RESEND_API_KEY'),
+
     ],
 
     'ses' => [
@@ -28,6 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'resend' => [
+        'key' => env('RESEND_KEY'),
+    ],
+
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
@@ -35,4 +43,28 @@ return [
         ],
     ],
 
+
+    // Google OAuth Configuration
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/auth/google/callback'),
+        'guzzle' => [
+        'verify' => false, // Tắt SSL verification cho local
+        ],
+    ],
+
+    // MoMo Payment Configuration
+    'momo' => [
+        'partner_code' => env('MOMO_PARTNER_CODE'),
+        'access_key' => env('MOMO_ACCESS_KEY'),
+        'secret_key' => env('MOMO_SECRET_KEY'),
+        'endpoint' => env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create'),
+        'redirect_url' => env('MOMO_REDIRECT_URL', env('APP_URL') . '/payment/momo/callback'),
+        'ipn_url' => env('MOMO_IPN_URL', env('APP_URL') . '/payment/momo/ipn'),
+    ],
+
 ];
+
+
+

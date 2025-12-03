@@ -255,6 +255,33 @@ class MoMoController extends Controller
         }
     }
 
+    // 4. IPN (Webhook từ MoMo) - Giữ lại từ code cũ phòng khi cần
+    public function ipn(Request $request)
+    {
+        Log::info('MoMo IPN Data:', $request->all());
+        $orderCode = $request->orderId; // MoMo trả về orderId là cái mình gửi đi (order_code)
+        $resultCode = $request->resultCode;
+
+        $order = Order::where('order_code', $orderCode)->first();
+
+        if ($order) {
+            if ($resultCode == 0) {
+                $order->update(['status_payment' => 'paid', 'trans_id' => $request->transId]);
+            } else {
+                $order->update(['status_payment' => 'failed']);
+            }
+        }
+        return response()->json(['message' => 'IPN received'], 200);
+    }
+
+    // 5. CHECK STATUS - Giữ lại từ code cũ
+    public function checkStatus($orderId)
+    {
+        $order = Order::where('order_id', $orderId)->where('user_id', Auth::id())->first();
+        if (!$order) return response()->json(['error' => 'Order not found'], 404);
+        return response()->json($order);
+    }
+
     // Helper: Gửi Request Curl
     private function execPostRequest($url, $data) {
         $ch = curl_init($url);
@@ -267,6 +294,10 @@ class MoMoController extends Controller
         ]);
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        
+        // Tắt kiểm tra SSL (Quan trọng khi chạy Localhost)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+
         $result = curl_exec($ch);
         curl_close($ch);
         return $result;

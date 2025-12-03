@@ -32,6 +32,11 @@
             </li>
             <hr class="sidebar-divider">
             <div class="sidebar-heading">Kinh doanh</div>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/categories"><i class="fas fa-fw fa-folder"></i><span>Danh mục & Hãng</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('products.index') }}"><i class="fas fa-fw fa-box"></i><span>Quản lý Sản phẩm</span></a>
            <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.inventory') }}">
                     <i class="fas fa-fw fa-boxes"></i>
