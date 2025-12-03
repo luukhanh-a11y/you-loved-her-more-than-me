@@ -6,16 +6,11 @@
         <i class="bi bi-cart3"></i> Giỏ hàng của bạn
     </h1>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
+    {{-- Flash Messages --}}
+    @if(session('success') || session('error'))
+        <div class="alert alert-dismissible fade show 
+            {{ session('success') ? 'alert-success' : 'alert-danger' }}" role="alert">
+            {{ session('success') ?? session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -97,13 +92,12 @@
                                             </td>
                                             <td class="text-center pe-4">
                                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                            onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -117,9 +111,9 @@
                     <a href="{{ route('shop.index') }}" class="btn btn-outline-dark rounded-0">
                         <i class="bi bi-arrow-left me-2"></i> Tiếp tục mua sắm
                     </a>
+                    {{-- Form xóa toàn bộ giỏ hàng (POST, bỏ DELETE) --}}
                     <form action="{{ route('cart.clear') }}" method="POST">
                         @csrf
-                        @method('DELETE')
                         <button type="submit" class="btn btn-outline-danger rounded-0" 
                                 onclick="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')">
                             <i class="bi bi-trash me-2"></i> Xóa toàn bộ
@@ -167,69 +161,68 @@
         </div>
     @endif
 </div>
-
+@endsection
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý tăng/giảm số lượng
+document.addEventListener('DOMContentLoaded', function () {
+    // Tự động ẩn flash message sau 5 giây
+    setTimeout(function () {
+        document.querySelectorAll('.alert-dismissible').forEach(function (alert) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+        });
+    }, 5000);
+
+    // Xử lý nút cộng/trừ
     document.querySelectorAll('.btn-decrease, .btn-increase').forEach(button => {
-        button.addEventListener('click', function() {
-            const row = this.closest('tr');
-            const input = row.querySelector('.quantity-input');
-            const currentValue = parseInt(input.value);
+        button.addEventListener('click', function () {
+            const input = this.closest('tr').querySelector('.quantity-input');
+            let value = parseInt(input.value);
             const max = parseInt(input.max);
-            
-            if (this.classList.contains('btn-decrease') && currentValue > 1) {
-                input.value = currentValue - 1;
-            } else if (this.classList.contains('btn-increase') && currentValue < max) {
-                input.value = currentValue + 1;
+
+            if (this.classList.contains('btn-decrease') && value > 1) {
+                value--;
+            } else if (this.classList.contains('btn-increase') && value < max) {
+                value++;
             }
-            
+
+            input.value = value;
             updateQuantity(input);
         });
     });
 
     // Xử lý nhập trực tiếp
     document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('change', function() {
-            const max = parseInt(this.max);
+        input.addEventListener('change', function () {
             let value = parseInt(this.value);
-            
+            const max = parseInt(this.max);
+
             if (value < 1) value = 1;
             if (value > max) value = max;
-            
+
             this.value = value;
             updateQuantity(this);
         });
     });
 
-    // Hàm cập nhật số lượng
+    // Gửi request cập nhật số lượng
     function updateQuantity(input) {
         const itemId = input.dataset.itemId;
         const quantity = input.value;
-        const row = input.closest('tr');
-        const price = parseFloat(row.querySelector('.item-price').dataset.price);
-        
-        fetch(`/gio-hang/cap-nhat/${itemId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ quantity: quantity })
+
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+        formData.append('quantity', quantity);
+
+        fetch(`/cart/update/${itemId}`, {
+            method: 'POST',
+            body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Cập nhật thành tiền
-                row.querySelector('.item-total').textContent = data.itemTotal + 'đ';
-                
-                // Cập nhật tổng tiền
-                document.getElementById('subtotal').textContent = data.cartTotal + 'đ';
-                document.getElementById('total').textContent = data.cartTotal + 'đ';
+        .then(response => {
+            if (response.ok) {
+                location.reload(); // reload để cập nhật giá
             } else {
-                alert(data.message);
-                location.reload();
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
             }
         })
         .catch(error => {
@@ -240,4 +233,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-@endsections
+

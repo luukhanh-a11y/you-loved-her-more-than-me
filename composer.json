@@ -3,15 +3,15 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-<<<<<<< HEAD
         "laravel/socialite": "^5.23",
-=======
->>>>>>> 681d7cce9ec3cd7e75839bfe5707570a5a66f4e5
         "laravel/tinker": "^2.10.1"
     },
     "require-dev": {

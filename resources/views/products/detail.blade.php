@@ -2,7 +2,15 @@
 
 @section('body')
 <div class="container py-5">
-    
+
+    {{-- Flash message --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    @endif
+
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-dark">Trang chủ</a></li>
@@ -36,7 +44,9 @@
 
             <p class="text-muted mb-4">{{ $product->description }}</p>
 
-            <form action="#" method="POST"> @csrf
+            {{-- Form thêm vào giỏ --}}
+            <form action="{{ route('cart.add') }}" method="POST">
+                @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                 <div class="mb-3">

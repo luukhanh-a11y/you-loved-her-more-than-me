@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -17,19 +18,19 @@ class CartController extends Controller
     public function index()
     {
         $cart = $this->getOrCreateCart();
-        
+
         // Eager load để giảm query
         $cartItems = $cart->items()
             ->with(['variant.product'])
             ->get();
-        
+
         // Tính tổng tiền
-        $totalPrice = $cartItems->sum(function($item) {
-            $price = $item->variant->product->price_sale 
-                     ?? $item->variant->product->price;
+        $totalPrice = $cartItems->sum(function ($item) {
+            $price = $item->variant->product->price_sale
+                ?? $item->variant->product->price;
             return $price * $item->quantity;
         });
-        
+
         return view('cart.index', compact('cartItems', 'totalPrice'));
     }
 
@@ -69,11 +70,11 @@ class CartController extends Controller
             if ($cartItem) {
                 // Cập nhật số lượng
                 $newQuantity = $cartItem->quantity + $request->quantity;
-                
+
                 if ($variant->quantity < $newQuantity) {
                     return back()->with('error', 'Không đủ hàng trong kho!');
                 }
-                
+
                 $cartItem->update(['quantity' => $newQuantity]);
             } else {
                 // Thêm mới
@@ -85,7 +86,8 @@ class CartController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('cart.index')->with('success', 'Đã thêm vào giỏ hàng!');
+            // Flash message thành công
+            return redirect()->route('cart.index')->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -110,32 +112,12 @@ class CartController extends Controller
 
         // Kiểm tra tồn kho
         if ($cartItem->variant->quantity < $request->quantity) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không đủ hàng trong kho!'
-            ], 400);
+            return back()->with('error', 'Không đủ hàng trong kho!');
         }
 
         $cartItem->update(['quantity' => $request->quantity]);
 
-        // Tính lại tổng tiền
-        $price = $cartItem->variant->product->price_sale 
-                 ?? $cartItem->variant->product->price;
-        $itemTotal = $price * $request->quantity;
-
-        // Tổng tiền giỏ hàng
-        $cartTotal = $cart->items()->get()->sum(function($item) {
-            $price = $item->variant->product->price_sale 
-                     ?? $item->variant->product->price;
-            return $price * $item->quantity;
-        });
-
-        return response()->json([
-            'success' => true,
-            'itemTotal' => number_format($itemTotal),
-            'cartTotal' => number_format($cartTotal),
-            'message' => 'Cập nhật thành công!'
-        ]);
+        return back()->with('success', 'Cập nhật số lượng thành công!');
     }
 
     /**

@@ -12,15 +12,20 @@ class CartItem extends Model
     protected $fillable = [
         'cart_id',
         'product_variant_id',
-        'quantity'
+        'quantity',
     ];
 
+    /**
+     * Quan hệ: 1 cartItem thuộc về 1 giỏ hàng
+     */
     public function cart()
     {
         return $this->belongsTo(Cart::class);
     }
 
-    // Món hàng này ứng với biến thể nào (để lấy giá, tên...)
+    /**
+     * Quan hệ: 1 cartItem thuộc về 1 biến thể sản phẩm
+     */
     public function variant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');

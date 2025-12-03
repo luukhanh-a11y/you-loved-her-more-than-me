@@ -42,8 +42,7 @@
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ route('google.login') }}">
-                            <a href="#" class="btn btn-outline-danger w-100 rounded-0">
+                            <a href="{{ route('google.login') }}" class="btn btn-outline-danger w-100 rounded-0">
                                 <i class="bi bi-google"></i> Google
                             </a>
                         </div>
