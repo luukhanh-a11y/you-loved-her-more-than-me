@@ -36,31 +36,39 @@
 
             <p class="text-muted mb-4">{{ $product->description }}</p>
 
-            <form action="#" method="POST"> @csrf
+           <!-- Form thêm vào giỏ -->
+            <form action="{{ route('cart.add') }}" method="POST">
+                @csrf
+                <!-- ID sản phẩm (ẩn) -->
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
 
+                <!-- Chọn Size -->
                 <div class="mb-3">
                     <label class="fw-bold mb-2">Chọn Size:</label>
                     <div class="d-flex gap-2">
                         @foreach($product->variants->unique('size') as $variant)
-                            <input type="radio" class="btn-check" name="size" id="size-{{ $variant->size }}" value="{{ $variant->size }}" autocomplete="off" {{ $loop->first ? 'checked' : '' }}>
+                            <input type="radio" class="btn-check" name="size" id="size-{{ $variant->size }}" value="{{ $variant->size }}" required>
                             <label class="btn btn-outline-dark rounded-0 px-3" for="size-{{ $variant->size }}">{{ $variant->size }}</label>
                         @endforeach
                     </div>
                 </div>
 
+                <!-- Chọn Màu -->
                 <div class="mb-4">
                     <label class="fw-bold mb-2">Chọn Màu:</label>
                     <div class="d-flex gap-2">
                         @foreach($product->variants->unique('color') as $variant)
-                            <input type="radio" class="btn-check" name="color" id="color-{{ $variant->color }}" value="{{ $variant->color }}" autocomplete="off" {{ $loop->first ? 'checked' : '' }}>
+                            <input type="radio" class="btn-check" name="color" id="color-{{ $variant->color }}" value="{{ $variant->color }}" required>
                             <label class="btn btn-outline-secondary rounded-0" for="color-{{ $variant->color }}">{{ $variant->color }}</label>
                         @endforeach
                     </div>
                 </div>
 
+                <!-- Nút Mua -->
                 <div class="d-flex gap-3">
-                    <input type="number" name="quantity" value="1" min="1" class="form-control text-center" style="width: 70px;">
+                    <input type="number" name="quantity" value="1" min="1" class="form-control text-center rounded-0" style="width: 70px;">
+                    
+                    <!-- NÚT BẠN YÊU CẦU ĐÂY -->
                     <button type="submit" class="btn btn-dark rounded-0 flex-grow-1 text-uppercase fw-bold">
                         <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ
                     </button>

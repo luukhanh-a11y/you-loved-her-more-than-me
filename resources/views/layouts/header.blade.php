@@ -79,10 +79,15 @@
                     @csrf
                 </form>
 
-                <a href="#" class="text-dark position-relative" title="Giỏ hàng">
+               <a href="{{ route('cart.index') }}" class="text-dark position-relative" title="Giỏ hàng">
                     <i class="bi bi-cart3 fs-4"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge">
-                        2
+                        @auth
+                            <!-- Đếm số dòng trong bảng cart_items của user hiện tại -->
+                            {{ \App\Models\Cart::where('user_id', Auth::id())->first()?->items->count() ?? 0 }}
+                        @else
+                            0
+                        @endauth
                     </span>
                 </a>
 
