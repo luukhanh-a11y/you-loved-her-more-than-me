@@ -13,12 +13,10 @@
 <body>
     {{-- header --}}
     @include('layouts.header')
-    
      {{-- body --}}
     @yield('body')
     {{-- footer --}}
      @include('layouts.footers')
-     
-   
+
 </body>
 </html>
